@@ -138,13 +138,13 @@ func (m *Manager) podSource(pods *v1.Pod, method core.EventMethod) {
 		}
 	} else {
 		protocolsNumber := pods.Labels["protocols_number"]
-		number, err := strconv.Atoi(protocolsNumber);
+		number, err := strconv.Atoi(protocolsNumber)
 		if err != nil {
 			logrus.Errorf("ports number converted to int failed：", err.Error())
 		}
 		for i := 0; i < number; i++ {
 			protocol := pods.Labels[fmt.Sprintf("%s_%d", "protocol", i)]
-			portInfo := strings.Split(protocol,"_._")
+			portInfo := strings.Split(protocol, "_._")
 			mapPP[portInfo[0]] = portInfo[1]
 		}
 	}
@@ -180,6 +180,7 @@ func (m *Manager) podSource(pods *v1.Pod, method core.EventMethod) {
 			s.ContainerPort = portInfo.ContainerPort
 			s.Port = portInfo.ContainerPort
 			s.Note = mapPP[fmt.Sprintf("%d", s.Port)]
+			s.Protocol = mapPP[fmt.Sprintf("%d", s.Port)]
 			switch method {
 			case core.ADDEventMethod:
 				m.addPodSource(s)
@@ -203,6 +204,7 @@ func (m *Manager) RcPool(s *config.SourceBranch) {
 		Note:           s.Note,
 		Name:           s.RePoolName(),
 		EventID:        s.EventID,
+		Protocol:       s.Protocol,
 	}
 	etPool := core.Event{
 		Method: s.Method,
@@ -466,12 +468,12 @@ func (m *Manager) serviceSource(services *v1.Service, method core.EventMethod) {
 		Domain:     strings.Split(services.Labels["domain"], "___"),
 		Method:     method,
 		OriginPort: services.Labels["origin_port"],
+		Protocol:   services.Labels["protocol"],
 	}
 	// event domain
 	s.Domain = m.replaceDomain(s.Domain, s)
 	m.RcDomain(s)
-	//TODO: "stream" to !http
-	if services.Labels["protocol"] != "http" && services.Labels["protocol"] != "https" {
+	if s.Protocol != "http" && s.Protocol != "https" {
 		// event vs
 		m.RcVS(s)
 	} else {
