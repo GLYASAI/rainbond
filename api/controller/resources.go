@@ -977,7 +977,8 @@ func (t *TenantStruct) DeleteSingleServiceInfo(w http.ResponseWriter, r *http.Re
 	serviceID := r.Context().Value(middleware.ContextKey("service_id")).(string)
 	tenantID := r.Context().Value(middleware.ContextKey("tenant_id")).(string)
 	var req api_model.EtcdCleanReq
-	if httputil.ValidatorRequestStructAndErrorResponse(r, w, &req, nil) {
+
+	if values := httputil.ValidatorStructRequest(r, &req, nil); len(values) == 0 {
 		logrus.Debugf("delete service etcd keys : %+v", req.Keys)
 		handler.GetEtcdHandler().CleanAllServiceData(req.Keys)
 	}
