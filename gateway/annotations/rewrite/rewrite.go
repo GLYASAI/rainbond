@@ -27,7 +27,7 @@ import (
 
 // Config describes the per location redirect config
 type Config struct {
-	Rewrites []*Rewrite
+	Rewrites []*Rewrite `json:"rewrites"`
 	// Target URI where the traffic must be redirected
 	Target string `json:"target"`
 	// SSLRedirect indicates if the location section is accessible SSL only
@@ -42,9 +42,9 @@ type Config struct {
 
 // Rewrite matching request URI to replacement.
 type Rewrite struct {
-	Regex       string
-	Replacement string
-	Flag        string
+	Regex       string `json:"regex"`
+	Replacement string `json:"replacement"`
+	Flag        string `json:"flag"`
 }
 
 // Equal tests for equality between two Redirect types
@@ -119,7 +119,8 @@ func convert(in map[string]string) []*Rewrite {
 		}
 		rewrite := m[sli[0]]
 		if rewrite == nil {
-			m[k] = &Rewrite{}
+			rewrite = &Rewrite{}
+			m[k] = rewrite
 		}
 		switch sli[1] {
 		case "regex":

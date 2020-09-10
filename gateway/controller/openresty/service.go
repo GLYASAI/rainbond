@@ -32,12 +32,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/goodrain/rainbond/gateway/controller/openresty/nginxcmd"
-
 	"github.com/Sirupsen/logrus"
 	"github.com/golang/glog"
 	"github.com/goodrain/rainbond/cmd/gateway/option"
+	"github.com/goodrain/rainbond/gateway/annotations/rewrite"
 	"github.com/goodrain/rainbond/gateway/controller/openresty/model"
+	"github.com/goodrain/rainbond/gateway/controller/openresty/nginxcmd"
 	"github.com/goodrain/rainbond/gateway/controller/openresty/template"
 	v1 "github.com/goodrain/rainbond/gateway/v1"
 	"github.com/goodrain/rainbond/util"
@@ -231,8 +231,26 @@ func (o *OrService) getNgxServer(conf *v1.Config) (l7srv []*model.Server, l4srv 
 				PathRewrite:      false,
 				DisableProxyPass: loc.DisableProxyPass,
 			}
+			if server.ServerName == "maven.goodrain.me" {
+				location.Rewrite.Rewrites = []*rewrite.Rewrite{
+					{
+						Regex:       "^/(.*)$",
+						Replacement: "/artifactory/libs-release/$1",
+						Flag:        "break",
+					},
+				}
+			}
 			server.Locations = append(server.Locations, location)
 		}
+		var rewrites []model.Rewrite
+		for _, rw := range vs.Rewrites {
+			rewrites = append(rewrites, model.Rewrite{
+				Regex:       rw.Regex,
+				Replacement: rw.Replacement,
+				Flag:        rw.Flag,
+			})
+		}
+		server.Rewrites = rewrites
 		l7srv = append(l7srv, server)
 	}
 
