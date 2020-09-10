@@ -1392,14 +1392,6 @@ func (s *ServiceAction) VolumnVar(tsv *dbmodel.TenantServiceVolume, tenantID, fi
 				tsv.HostPath = fmt.Sprintf("%s/tenant/%s/service/%s%s", sharePath, tenantID, tsv.ServiceID, tsv.VolumePath)
 			//本地文件存储
 			case dbmodel.LocalVolumeType.String():
-				serviceInfo, err := db.GetManager().TenantServiceDao().GetServiceTypeById(tsv.ServiceID)
-				if err != nil {
-					return util.CreateAPIHandleErrorFromDBError("service type", err)
-				}
-				// local volume just only support state component
-				if serviceInfo == nil || !serviceInfo.IsState() {
-					return util.CreateAPIHandleError(400, fmt.Errorf("应用类型为'无状态'.不支持本地存储"))
-				}
 				tsv.HostPath = fmt.Sprintf("%s/tenant/%s/service/%s%s", localPath, tenantID, tsv.ServiceID, tsv.VolumePath)
 			}
 		}
