@@ -582,10 +582,6 @@ func (s *ServiceAction) ServiceCreate(sc *api_model.ServiceStruct) error {
 					v.HostPath = fmt.Sprintf("%s/tenant/%s/service/%s%s", sharePath, sc.TenantID, ts.ServiceID, volumn.VolumePath)
 				//本地文件存储
 				case dbmodel.LocalVolumeType.String():
-					if !dbmodel.ServiceType(sc.ExtendMethod).IsState() {
-						tx.Rollback()
-						return util.CreateAPIHandleError(400, fmt.Errorf("local volume type only support state component"))
-					}
 					v.HostPath = fmt.Sprintf("%s/tenant/%s/service/%s%s", localPath, sc.TenantID, ts.ServiceID, volumn.VolumePath)
 				case dbmodel.ConfigFileVolumeType.String(), dbmodel.MemoryFSVolumeType.String():
 					logrus.Debug("simple volume type : ", volumn.VolumeType)
@@ -768,10 +764,6 @@ func (s *ServiceAction) ServiceUpdate(sc map[string]interface{}) error {
 		for _, vo := range volumes {
 			if vo.VolumeType == dbmodel.ShareFileVolumeType.String() || vo.VolumeType == dbmodel.MemoryFSVolumeType.String() {
 				continue
-			}
-			if vo.VolumeType == dbmodel.LocalVolumeType.String() && !ts.IsState() {
-				err := fmt.Errorf("service[%s] has local volume type, can't change type to stateless", ts.ServiceAlias)
-				return err
 			}
 			// if component use volume, what it accessMode is rwo, can't change volume type to stateless
 			if vo.AccessMode == "RWO" && !ts.IsState() {
