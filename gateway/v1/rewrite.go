@@ -20,3 +20,11 @@ func (v *Rewrite) Equals(c *Rewrite) bool {
 	}
 	return true
 }
+
+func newFakeRewrite() *Rewrite {
+	return &Rewrite{
+		Regex:       "regex",
+		Replacement: "replacement",
+		Flag:        "flag",
+	}
+}
