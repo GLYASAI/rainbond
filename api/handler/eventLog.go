@@ -26,15 +26,15 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 
-	"github.com/coreos/etcd/clientv3"
-	"github.com/goodrain/rainbond/api/model"
-	api_model "github.com/goodrain/rainbond/api/model"
 	"github.com/goodrain/rainbond/db"
+
+	api_model "github.com/goodrain/rainbond/api/model"
 	dbmodel "github.com/goodrain/rainbond/db/model"
 	eventdb "github.com/goodrain/rainbond/eventlog/db"
-	"github.com/goodrain/rainbond/util/constants"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/coreos/etcd/clientv3"
 )
 
 //LogAction  log action struct
@@ -62,8 +62,10 @@ func (l *LogAction) GetEvents(target, targetID string, page, size int) ([]*dbmod
 }
 
 //GetLogList get log list
-func (l *LogAction) GetLogList(serviceAlias string) ([]*model.HistoryLogFile, error) {
-	logDIR := path.Join(constants.GrdataLogPath, serviceAlias)
+func (l *LogAction) GetLogList(serviceAlias string) ([]string, error) {
+	downLoadDIR := "/grdata/downloads"
+	urlPath := fmt.Sprintf("/log/%s", serviceAlias)
+	logDIR := fmt.Sprintf("%s%s", downLoadDIR, urlPath)
 	_, err := os.Stat(logDIR)
 	if os.IsNotExist(err) {
 		return nil, err
@@ -72,22 +74,25 @@ func (l *LogAction) GetLogList(serviceAlias string) ([]*model.HistoryLogFile, er
 	if err != nil {
 		return nil, err
 	}
-
-	var logFiles []*model.HistoryLogFile
-	for _, file := range fileList {
-		logfile := &model.HistoryLogFile{
-			Filename:     file.Name(),
-			RelativePath: path.Join("logs", serviceAlias, file.Name()),
-		}
-		logFiles = append(logFiles, logfile)
+	var logList []string
+	if len(fileList) == 0 {
+		return logList, nil
 	}
-	return logFiles, nil
+
+	for _, file := range fileList {
+		filePath := fmt.Sprintf("/logs/%s/%s", serviceAlias, file.Name())
+		logrus.Debugf("filepath is %s", file.Name())
+		logList = append(logList, filePath)
+	}
+	return logList, nil
 }
 
 //GetLogFile GetLogFile
 func (l *LogAction) GetLogFile(serviceAlias, fileName string) (string, string, error) {
-	logPath := path.Join(constants.GrdataLogPath, serviceAlias)
-	fullPath := path.Join(logPath, fileName)
+	downLoadDIR := "/grdata/downloads"
+	urlPath := fmt.Sprintf("/log/%s", serviceAlias)
+	fullPath := fmt.Sprintf("%s%s/%s", downLoadDIR, urlPath, fileName)
+	logPath := fmt.Sprintf("%s/log/%s", downLoadDIR, serviceAlias)
 	_, err := os.Stat(fullPath)
 	if os.IsNotExist(err) {
 		return "", "", err

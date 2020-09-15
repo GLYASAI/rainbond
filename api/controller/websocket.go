@@ -22,7 +22,6 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"path"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/go-chi/chi"
@@ -30,7 +29,6 @@ import (
 	"github.com/goodrain/rainbond/api/handler"
 	"github.com/goodrain/rainbond/api/middleware"
 	"github.com/goodrain/rainbond/api/proxy"
-	"github.com/goodrain/rainbond/util/constants"
 )
 
 //DockerConsole docker console
@@ -140,7 +138,7 @@ var logFile *LogFile
 func GetLogFile() *LogFile {
 	root := os.Getenv("SERVICE_LOG_ROOT")
 	if root == "" {
-		root = constants.GrdataLogPath
+		root = "/grdata/downloads/log/"
 	}
 	logrus.Infof("service logs file root path is :%s", root)
 	if logFile == nil {
@@ -155,7 +153,7 @@ func GetLogFile() *LogFile {
 func (d LogFile) Get(w http.ResponseWriter, r *http.Request) {
 	gid := chi.URLParam(r, "gid")
 	filename := chi.URLParam(r, "filename")
-	filePath := path.Join(d.Root, gid, filename)
+	filePath := d.Root + gid + "/" + filename
 	if isExist(filePath) {
 		http.ServeFile(w, r, filePath)
 	} else {
