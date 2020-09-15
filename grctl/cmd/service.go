@@ -31,7 +31,6 @@ import (
 	eventdb "github.com/goodrain/rainbond/eventlog/db"
 	"github.com/goodrain/rainbond/grctl/clients"
 	coreutil "github.com/goodrain/rainbond/util"
-	"github.com/goodrain/rainbond/util/constants"
 	"github.com/gorilla/websocket"
 	"github.com/gosuri/uitable"
 	"github.com/tidwall/gjson"
@@ -217,7 +216,7 @@ func getEventLog(c *cli.Context) error {
 		}
 	} else {
 		logdb := &eventdb.EventFilePlugin{
-			HomePath: constants.GrdataLogPath,
+			HomePath: "/grdata/downloads/log/",
 		}
 		list, err := logdb.GetMessages(eventID, "debug", 0)
 		if err != nil {
