@@ -27,6 +27,8 @@ func TestVirtualService_Equals(t *testing.T) {
 	v.Locations = append(v.Locations, vlocA)
 	v.Locations = append(v.Locations, vlocB)
 	v.SSLCert = newFakeSSLCert()
+	rewriteA := newFakeRewrite()
+	v.Rewrites = append(v.Rewrites, rewriteA)
 
 	c := newFakeVirtualService()
 	clocA := newFakeLocation()
@@ -34,6 +36,8 @@ func TestVirtualService_Equals(t *testing.T) {
 	c.Locations = append(c.Locations, clocA)
 	c.Locations = append(c.Locations, clocB)
 	c.SSLCert = newFakeSSLCert()
+	rewriteB := newFakeRewrite()
+	c.Rewrites = append(c.Rewrites, rewriteB)
 
 	if !v.Equals(c) {
 		t.Errorf("v should equal c")

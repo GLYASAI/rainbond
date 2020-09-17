@@ -173,7 +173,7 @@ func New(client kubernetes.Interface,
 	// create informers factory, enable and assign required informers
 	store.sharedInformer = informers.NewFilteredSharedInformerFactory(client, conf.ResyncPeriod, corev1.NamespaceAll,
 		func(options *metav1.ListOptions) {
-			options.LabelSelector = "creator=Rainbond"
+			options.LabelSelector = "creater=Rainbond"
 		})
 
 	store.informers.Ingress = store.sharedInformer.Extensions().V1beta1().Ingresses().Informer()
@@ -597,6 +597,16 @@ func (s *k8sStore) ListVirtualService() (l7vs []*v1.VirtualService, l4vs []*v1.V
 							vs.SSLCert = hostSSLMap[DefVirSrvName]
 						}
 					}
+
+					var rewrites []*v1.Rewrite
+					for _, rw := range anns.Rewrite.Rewrites {
+						rewrites = append(rewrites, &v1.Rewrite{
+							Regex:       rw.Regex,
+							Replacement: rw.Replacement,
+							Flag:        rw.Flag,
+						})
+					}
+					vs.Rewrites = rewrites
 
 					l7vsMap[virSrvName] = vs
 					l7vs = append(l7vs, vs)

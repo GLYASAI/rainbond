@@ -59,6 +59,7 @@ type VirtualService struct {
 	Locations        []*Location            `json:"locations"`
 	ForceSSLRedirect bool                   `json:"force_ssl_redirect"`
 	ExtensionConfig  map[string]interface{} `json:"extension_config"`
+	Rewrites         []*Rewrite             `json:"rewrites"`
 }
 
 //Equals equals vs
@@ -182,6 +183,22 @@ func (v *VirtualService) Equals(c *VirtualService) bool {
 	}
 	for key, ve := range v.ExtensionConfig {
 		if c.ExtensionConfig[key] != ve {
+			return false
+		}
+	}
+
+	if len(v.Rewrites) != len(c.Rewrites) {
+		return false
+	}
+	for _, vRewrite := range v.Rewrites {
+		flag := false
+		for _, cRewrite := range c.Rewrites {
+			if vRewrite.Equals(cRewrite) {
+				flag = true
+				break
+			}
+		}
+		if !flag {
 			return false
 		}
 	}
