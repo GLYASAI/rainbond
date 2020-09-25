@@ -724,7 +724,7 @@ func (s *k8sStore) ingressIsValid(ing *extensions.Ingress) bool {
 		return false
 	}
 	for _, ep := range endpoint.Subsets {
-		if (ep.Addresses == nil || len(ep.Addresses) == 0) && (ep.NotReadyAddresses == nil || len(ep.NotReadyAddresses) == 0) {
+		if ep.Addresses == nil || len(ep.Addresses) == 0 {
 			logrus.Debugf("Endpoints(%s) is empty, ignore it", endpointKey)
 			return false
 		}
