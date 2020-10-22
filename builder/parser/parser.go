@@ -180,6 +180,7 @@ type ServiceInfo struct {
 	Args           []string       `json:"args,omitempty"`
 	DependServices []string       `json:"depends,omitempty"`
 	ServiceType    string         `json:"service_type,omitempty"`
+	DeployType     string         `json:"deploy_type,omitempty"`
 	Branchs        []string       `json:"branchs,omitempty"`
 	Memory         int            `json:"memory,omitempty"`
 	Lang           code.Lang      `json:"language,omitempty"`

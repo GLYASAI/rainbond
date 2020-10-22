@@ -225,6 +225,9 @@ func (d *DockerComposeParse) GetServiceInfo() []ServiceInfo {
 			Cname:          service.name,
 			OS:             runtime.GOOS,
 		}
+		if model.ServiceType(service.serviceType).IsState() {
+			si.DeployType = "StatefulServiceType"
+		}
 		if service.memory != 0 {
 			si.Memory = service.memory
 		} else {
