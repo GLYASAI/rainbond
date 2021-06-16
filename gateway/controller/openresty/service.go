@@ -211,6 +211,9 @@ func (o *OrService) getNgxServer(conf *v1.Config) (l7srv []*model.Server, l4srv 
 				"tenant_id":  vs.Namespace,
 				"service_id": vs.ServiceID,
 			},
+			ProxyStreamNextUpstream:        true,
+			ProxyStreamNextUpstreamTimeout: "600s",
+			ProxyStreamNextUpstreamTries:   3,
 		}
 		if vs.SSLCert != nil {
 			server.SSLCertificate = vs.SSLCert.CertificatePem
@@ -261,8 +264,10 @@ func (o *OrService) getNgxServer(conf *v1.Config) (l7srv []*model.Server, l4srv 
 				"tenant_id":  vs.Namespace,
 				"service_id": vs.ServiceID,
 			},
-			UpstreamName:         vs.PoolName,
-			ProxyStreamResponses: 1,
+			UpstreamName:                   vs.PoolName,
+			ProxyStreamNextUpstream:        true,
+			ProxyStreamNextUpstreamTimeout: "600s",
+			ProxyStreamNextUpstreamTries:   3,
 		}
 		server.Listen = strings.Join(vs.Listening, " ")
 		l4srv = append(l4srv, server)
